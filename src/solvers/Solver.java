@@ -1,4 +1,7 @@
-package cvrp;
+package solvers;
+
+import cvrp.CVRP;
+import cvrp.Solution;
 
 public abstract class Solver {
 	
@@ -8,9 +11,9 @@ public abstract class Solver {
 		this.setCvrp(cvrp);
 	}
 	
-	abstract Solution find_solution();
+	public abstract Solution find_solution();
 	
-	abstract void load_configuration(String conf_file);
+	public abstract void load_configuration(String conf_file);
 
 	public CVRP getCvrp() {
 		return cvrp;

@@ -1,8 +1,11 @@
-package cvrp;
+package solvers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import cvrp.CVRP;
+import cvrp.Solution;
 
 public class RandomSolver extends Solver {
 	
@@ -11,7 +14,7 @@ public class RandomSolver extends Solver {
 	}
 
 	@Override
-	Solution find_solution() {
+	public Solution find_solution() {
 		Solution solution = new Solution();
 		
 		// prepare lists for populating the solution
@@ -56,7 +59,7 @@ public class RandomSolver extends Solver {
 	}
 
 	@Override
-	void load_configuration(String conf_file) {
+	public void load_configuration(String conf_file) {
 		// no configuration for random solver
 		System.out.println("Configuraiton loaded");
 	}

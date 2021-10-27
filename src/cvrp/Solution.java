@@ -13,6 +13,6 @@ public class Solution {
 	}
 	
 	public Solution(List<Integer> solution) {
-		this.solution = solution;
+		this.solution = new ArrayList<Integer>(solution);
 	}
 }

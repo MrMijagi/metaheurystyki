@@ -21,7 +21,7 @@ public class CVRP {
 	private double[][] distance_matrix;
 	
 	// returns cost of passed solution
-	public double calculate_cost(Solution solution) {
+	public double calculateCost(Solution solution) {
 		double cost = 0.;
 		int curr_location = 0;    // depot
 		
@@ -40,11 +40,16 @@ public class CVRP {
 		// come back to depot
 		cost += this.getDistance(curr_location, 0);
 		
+		// check if solution is correct
+		if (!this.checkIfCorrectSolution(solution)) {
+			cost += 1000;      // punishment
+		}
+		
 		return cost;
 	}
 	
 	// returns true only if solution is correct
-	public boolean check_if_correct_solution(Solution solution) {
+	public boolean checkIfCorrectSolution(Solution solution) {
 		int capacity = 0;
 		final int max_capacity = Integer.parseInt(this.problem_description.get("CAPACITY"));
 		int curr_location = 0;
@@ -59,14 +64,14 @@ public class CVRP {
 				capacity = 0;
 			} else {                               // normal location - add capacity
 				capacity += this.locations[curr_location].getDemand();
-				
-				// check for duplicates
-				if (!duplicates.add(curr_location)) {
-					return false;
-				}
 			}
 						
 			if (capacity > max_capacity) {         // solution is incorrect
+				return false;
+			}
+			
+			// check for duplicates
+			if (!duplicates.add(curr_location)) {
 				return false;
 			}
 		}
@@ -88,7 +93,7 @@ public class CVRP {
 	}
 	
 	// calculates distances between each pair of locations
-	public void calculate_distance_matrix() {
+	public void calculateDistanceMatrix() {
 		int dimension = Integer.parseInt(problem_description.get("DIMENSION"));
 		this.distance_matrix = new double[dimension][dimension];
 		
@@ -169,7 +174,7 @@ public class CVRP {
 			br.close();
 			
 			// calculate distance matrix after locations have been loaded
-			this.calculate_distance_matrix();
+			this.calculateDistanceMatrix();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -205,7 +210,7 @@ public class CVRP {
 		
 		// append cost
 		string_to_save.append("\n\nCost: ");
-		string_to_save.append(this.calculate_cost(solution));
+		string_to_save.append(this.calculateCost(solution));
 		string_to_save.append("\n");
 		
 		try {
@@ -226,7 +231,7 @@ public class CVRP {
 		return this.locations[index];
 	}
 	
-	// get distance between the two locations pointed by indexes
+	// get distance between the two locations pointed by indices
 	public double getDistance(int i, int j) {
 		return this.distance_matrix[i][j];
 	}

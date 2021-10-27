@@ -69,5 +69,42 @@ class CVRPTest {
 			assertEquals(cvrp.getDistance(0, i), distance_matrix[i]);
 		}
 	}
+	
+	@Test
+	void testCalculateCost() {
+		CVRP cvrp = new CVRP();
+		
+		try {
+			cvrp.loadProblem("problems/toy.vrp");
+		} catch (WrongInputFileFormat e) {
+			e.printStackTrace();
+		}
+		
+		List<Integer> route = Arrays.asList(
+				1, 4, -1, 3, 2, 5, -2, -3, -4, -5);
+		
+		Solution correct_solution = new Solution(route);
+		
+		assertEquals((int) (cvrp.calculateCost(correct_solution)), 265);
+	}
+	
+	@Test
+	void testCheckIfCorrectSolution() {
+		CVRP cvrp = new CVRP();
+		
+		try {
+			cvrp.loadProblem("problems/toy.vrp");
+		} catch (WrongInputFileFormat e) {
+			e.printStackTrace();
+		}
+		
+		List<Integer> route = Arrays.asList(
+			-4, -2, -2, -1, -1, -5, -2, -1, -2, -2
+		);
+		
+		Solution solution = new Solution(route);
+		
+		assertFalse(cvrp.checkIfCorrectSolution(solution));
+	}
 
 }

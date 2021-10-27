@@ -1,9 +1,11 @@
-package cvrp;
+package main;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import cvrp.Solution;
 
 public class Logger {
 
@@ -22,11 +24,11 @@ public class Logger {
 		
 		
 		for (int i = 1; i < pop_size; i++) {
-			if (pop[i].evaluation > best) {
+			if (pop[i].evaluation < best) {
 				best = pop[i].evaluation;
 			}
 			
-			if (pop[i].evaluation < worst) {
+			if (pop[i].evaluation > worst) {
 				worst = pop[i].evaluation;
 			}
 			

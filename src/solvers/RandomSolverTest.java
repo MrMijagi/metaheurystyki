@@ -1,8 +1,11 @@
-package cvrp;
+package solvers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import cvrp.CVRP;
+import cvrp.WrongInputFileFormat;
 
 class RandomSolverTest {
 
@@ -18,7 +21,7 @@ class RandomSolverTest {
 		RandomSolver randomSolver = new RandomSolver(cvrp);
 		
 		for (int i = 0; i < 10000; i++) {
-			assertTrue(cvrp.check_if_correct_solution(randomSolver.find_solution()));
+			assertTrue(cvrp.checkIfCorrectSolution(randomSolver.find_solution()));
 		}
 	}
 

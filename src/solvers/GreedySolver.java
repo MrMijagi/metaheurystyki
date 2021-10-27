@@ -1,17 +1,28 @@
-package cvrp;
+package solvers;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class GreedySolver extends Solver {
+import cvrp.CVRP;
+import cvrp.Solution;
+import ga.CrossoverOperators;
+import ga.MutationOperators;
+import ga.SelectionOperators;
 
+public class GreedySolver extends Solver {
+	
+	private int first_location;
+	
 	public GreedySolver(CVRP cvrp) {
 		super(cvrp);
 	}
 
 	@Override
-	Solution find_solution() {
+	public Solution find_solution() {
 		Solution solution = new Solution();
 		
 		// prepare lists for populating the solution
@@ -33,6 +44,18 @@ public class GreedySolver extends Solver {
 		int closest_location, location, demand;
 		int last_location = 0;
 		double min_distance, distance;
+		
+		// check if first location was defined
+		if (this.first_location != -1) {
+			// update capacity
+			capacity += this.cvrp.getLocation(this.first_location).getDemand();
+			// add the location
+			solution.solution.add(first_location);
+			// remove by value from list of locations
+			locations.remove(Integer.valueOf(first_location));
+			// remember last location
+			last_location = first_location;
+		}
 		
 		while (!locations.isEmpty()) {
 			// find the closest location
@@ -80,8 +103,27 @@ public class GreedySolver extends Solver {
 	}
 
 	@Override
-	void load_configuration(String conf_file) {
-		// no configuration for random solver
-		System.out.println("Configuraiton loaded");
+	public void load_configuration(String conf_file) {
+		try {			
+			BufferedReader br = new BufferedReader(new FileReader(conf_file));
+			String line = br.readLine();
+			
+			while (line != null) {
+				if (line.contains(":")) {
+					String[] parts = line.split(":");
+										
+					switch(parts[0].trim()) {
+					case "FIRST_CITY":
+						this.first_location = Integer.parseInt(parts[1].trim());
+						break;
+					}
+				}
+				
+				line = br.readLine();
+			}
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
