@@ -1,6 +1,7 @@
 package main;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import cvrp.CVRP;
@@ -55,8 +56,8 @@ public class Main {
 		System.out.println("\nSaving solution to: " + file_out);
 		cvrp.saveResult("solutions/" + file_out, solution);
 	}
-
-	public static void main(String[] args) {
+	
+	public static void testingGrounds() {
 		String[] all_problems = {
 				"toy.vrp",
 				"A-n32-k5.vrp",
@@ -79,10 +80,28 @@ public class Main {
 		Solver greedySolver = new GreedySolver(cvrp);
 		greedySolver.load_configuration("configs/greedy.txt");
 		
-		for (int i = 1; i < 2; i++) {
+		for (int i = 7; i < 8; i++) {
 			solveProblem(all_problems[i], cvrp, randomSolver);
-			//solveProblem(all_problems[i], cvrp, greedySolver);
-			//solveProblem(all_problems[i], cvrp, gaSolver);
+			solveProblem(all_problems[i], cvrp, greedySolver);
+			solveProblem(all_problems[i], cvrp, gaSolver);
 		}
+	}
+
+	public static void main(String[] args) {
+		testingGrounds();
+		
+		CVRP cvrp = new CVRP();
+		
+		try {
+			cvrp.loadProblem("problems/toy.vrp");
+		} catch (WrongInputFileFormat e) {
+			e.printStackTrace();
+		}
+		
+		Solution solution = new Solution(Arrays.asList(
+			1, 4, -1, 3, 2, 5, -4, -4, -4, -4
+		));
+		
+		System.out.println("calculated cost: " + cvrp.calculateCost(solution));
 	}
 }

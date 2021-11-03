@@ -68,7 +68,17 @@ public class GeneticAlgorithmSolver extends Solver {
 			List<Solution> new_pop = new ArrayList<Solution>();
 			
 			// take the best solution from previous pop
-			Solution first = new Solution(best_solution.solution);
+			double min_evaluation = pop[0].evaluation;
+			int min_index = 0;
+			for (int i = 0; i < this.pop_size; i++) {
+				if (pop[i].evaluation < min_evaluation) {
+					min_evaluation = pop[i].evaluation;
+					min_index = i;
+				}
+			}
+			
+			//Solution first = new Solution(best_solution.solution);
+			Solution first = new Solution(pop[min_index].solution);
 			first.evaluation = cvrp.calculateCost(first);
 			new_pop.add(first);
 			
@@ -89,13 +99,19 @@ public class GeneticAlgorithmSolver extends Solver {
 				for (Solution child: children) {
 					this.mutator.mutation(child, this.mutation_prob);
 					
-					child.evaluation = this.cvrp.calculateCost(child);
-					new_pop.add(child);
-					
-					if (child.evaluation < best_solution.evaluation) {
-						best_solution = child;
+					// before adding it to next pop, check if it's not a clone		
+					if (!this.check_if_clone(new_pop, child)) {
+						child.evaluation = this.cvrp.calculateCost(child);
+						new_pop.add(child);
+						
+						if (child.evaluation < best_solution.evaluation) {
+							best_solution = child;
+						}
 					}
 				}
+				
+				// clear children list
+				children.clear();
 			}
 			
 			pop = new Solution[new_pop.size()];
@@ -161,6 +177,14 @@ public class GeneticAlgorithmSolver extends Solver {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private boolean check_if_clone(List<Solution> pop, Solution solution) {
+		for (Solution individual: pop) {
+			if (solution.solution.equals(individual.solution)) return true;
+		}
+		
+		return false;
 	}
 	
 	private void evaluate_pop(Solution[] pop) {

@@ -44,6 +44,12 @@ public class Logger {
 		this.string_to_save.append(avg);
 		this.string_to_save.append(";");
 		this.string_to_save.append(worst);
+		
+//		for (int i = 0; i < pop_size; i++) {
+//			this.string_to_save.append(";");
+//			this.string_to_save.append(pop[i].evaluation);
+//		}
+		
 		this.string_to_save.append("\n");
 	}
 	

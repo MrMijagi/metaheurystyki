@@ -14,9 +14,7 @@ public class MutationOperators {
 				int random_index = ThreadLocalRandom.current().nextInt(0, o1.solution.size());
 				
 				if (random_index != i) {      // make sure not to swap the same element
-					int tmp = o1.solution.get(i);
-					o1.solution.set(i, o1.solution.get(random_index));
-					o1.solution.set(random_index, tmp);
+					o1.swapFromIndices(i, random_index);
 				}
 			}
 		}

@@ -22,5 +22,16 @@ class SolutionTest {
 		assertFalse(p1.solution == p2.solution);
 		assertTrue(p1.solution.equals(p2.solution));
 	}
-
+	
+	@Test
+	void testSwapFromIndices() {
+		Solution solution = new Solution(Arrays.asList(
+			1, 2, 3
+		));
+		solution.swapFromIndices(0, 2);
+		
+		List<Integer> swapped = Arrays.asList(3, 2, 1);
+		
+		assertEquals(solution.solution, swapped);
+	}
 }
