@@ -26,7 +26,8 @@ public class CrossoverOperators {
 		}
 		
 		// eliminate all values from the range from p2 copy
-		p2_route_copy.subList(from_index, to_index).clear();
+		List<Integer> p1_sub_list = p1.solution.subList(from_index, to_index);
+		p2_route_copy.removeAll(p1_sub_list);
 		
 		for (int i = from_index; i < to_index; i++) {
 			child.solution.add(p1.solution.get(i));

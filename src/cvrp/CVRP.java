@@ -24,12 +24,22 @@ public class CVRP {
 	// returns cost of passed solution
 	public double calculateCost(Solution solution) {
 		double cost = 0.;
+		int capacity = 0;
 		int curr_location = 0;    // depot
 		
 		for (int i = 0; i < solution.solution.size(); i++) {
 			int next_location = solution.solution.get(i) < 0 ? 0 : solution.solution.get(i);
 			
-			if (i == 0) {         // start route
+			if (next_location == 0) {         // go back to depot
+				capacity = 0;
+			} else {
+				capacity += this.getLocation(next_location).getDemand();
+			}
+			
+			// check if capacity was reached
+			if (capacity > this.getCapacity()) {
+				// punishment
+				cost += this.getDistance(curr_location, 0);
 				cost += this.getDistance(0, next_location);
 			} else {
 				cost += this.getDistance(curr_location, next_location);
@@ -43,7 +53,7 @@ public class CVRP {
 		
 		// check if solution is correct - add punishment value
 		// punishment = maximum distance between any two locations * 2 * multiplier
-		cost += 0.2 * this.max_distance * this.getPunishmentMultiplier(solution);
+		//cost += 1 * this.max_distance * this.getPunishmentMultiplier(solution);
 		
 		return cost;
 	}

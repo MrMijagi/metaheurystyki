@@ -17,8 +17,13 @@ public class GreedySolver extends Solver {
 	
 	private int first_location;
 	
-	public GreedySolver(CVRP cvrp) {
+	public GreedySolver(CVRP cvrp, int first_location) {
 		super(cvrp);
+		this.first_location = first_location;
+	}
+	
+	public GreedySolver(CVRP cvrp) {
+		this(cvrp, -1);
 	}
 
 	@Override
@@ -47,6 +52,10 @@ public class GreedySolver extends Solver {
 		
 		// check if first location was defined
 		if (this.first_location != -1) {
+			if (this.first_location >= dimension) {
+				throw new IllegalArgumentException("first_location out of range!");
+			}
+			
 			// update capacity
 			capacity += this.cvrp.getLocation(this.first_location).getDemand();
 			// add the location
