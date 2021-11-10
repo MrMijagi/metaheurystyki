@@ -163,6 +163,7 @@ public class GeneticAlgorithmSolver extends Solver {
 						break;
 					case "SELECTION_PARAM":
 						this.selection_param = Integer.parseInt(parts[1].trim());
+						break;
 					case "CROSSOVER_TYPE":
 						if (parts[1].trim().equals("OX")) {
 							this.crossover = CrossoverOperators::crossover;
