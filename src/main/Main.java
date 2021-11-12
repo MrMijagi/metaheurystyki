@@ -15,6 +15,7 @@ import solvers.GeneticAlgorithmSolver;
 import solvers.GreedySolver;
 import solvers.RandomSolver;
 import solvers.Solver;
+import solvers.TabuSearchSolver;
 
 public class Main {
 	
@@ -143,6 +144,37 @@ public class Main {
 		
 		saveStatistics(evaluations, how_many_solutions, file_to_save);
 	}
+
+	public static void getTabuSearchSolverStatistics(String file, String config_file, String file_to_save, int how_many_solutions) {
+		CVRP cvrp = new CVRP();
+		
+		try {
+			cvrp.loadProblem("problems/" + file);
+		} catch (WrongInputFileFormat e) {
+			e.printStackTrace();
+			System.out.println("Couldn't load the problem.");
+		}
+		
+		Solver solver;
+		System.out.println("\nProblem loaded.");
+		
+		double[] evaluations = new double[how_many_solutions];
+		Solution solution;
+		
+		for (int i = 0; i < how_many_solutions; i++) {
+			solver = new TabuSearchSolver(cvrp);
+			solver.load_configuration(config_file);
+			
+			do {
+				solution = solver.find_solution();
+				System.out.println(cvrp.checkIfCorrectSolution(solution));
+			} while(!cvrp.checkIfCorrectSolution(solution));
+			
+			evaluations[i] = cvrp.calculateCost(solution);
+		}
+		
+		saveStatistics(evaluations, how_many_solutions, file_to_save);
+	}
 	
 	public static void solveProblem(String file, CVRP cvrp, Solver solver) {
 		try {
@@ -188,10 +220,14 @@ public class Main {
 		Solver greedySolver = new GreedySolver(cvrp);
 		greedySolver.load_configuration("configs/greedy.txt");
 		
+		Solver tsSolver = new TabuSearchSolver(cvrp);
+		tsSolver.load_configuration("configs/ts.txt");
+		
 		for (int i = 1; i < 2; i++) {
 			//solveProblem(all_problems[i], cvrp, randomSolver);
 			//solveProblem(all_problems[i], cvrp, greedySolver);
-			solveProblem(all_problems[i], cvrp, gaSolver);
+			//solveProblem(all_problems[i], cvrp, gaSolver);
+			solveProblem(all_problems[i], cvrp, tsSolver);
 		}
 	}
 
@@ -226,7 +262,8 @@ public class Main {
 		for (int i = 1; i < 8; i++) {
 			//getRandomSolverStatistics(all_problems[i], "stats/randomStats" + all_problems[i] + ".csv", 10000);
 			//getGreedySolverStatistics(all_problems[i], "stats/greedyStats" + all_problems[i] + ".csv");
-			getGeneticAlgorithmSolverStatistics(all_problems[i], "configs/ga.txt", "stats/gaStats" + all_problems[i] + ".csv", 10);
+			//getGeneticAlgorithmSolverStatistics(all_problems[i], "configs/ga.txt", "stats/gaStats" + all_problems[i] + ".csv", 10);
+			getTabuSearchSolverStatistics(all_problems[i], "configs/ts.txt", "stats/tsStats" + all_problems[i] + ".csv", 10);
 			System.out.println(i);
 		}
 	}

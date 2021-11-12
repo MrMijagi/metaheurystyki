@@ -32,6 +32,16 @@ public class NeighborsOperators {
 		return neighbors;
 	}
 	
+	private static boolean checkIfSimilarNeighbor(List<Solution> neighbors, Solution swapped) {
+		for (Solution neighbor: neighbors) {
+			if (neighbor.solution == swapped.solution) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public static List<Solution> getRandomNeighbors(Solution solution, int size) {
 		List<Solution> neighbors = new ArrayList<Solution>();
 		Solution swapped;
@@ -44,9 +54,15 @@ public class NeighborsOperators {
 				// copy the original one
 				swapped = new Solution(solution.solution);
 				// swap
-				swapped.swapFromIndices(from_index, to_index);
+				//swapped.swapFromIndices(from_index, to_index);
+				// inverse
+				swapped.inverseFromIndices(from_index, to_index);
 				// add to list
 				neighbors.add(swapped);
+				// add to list if there are no similar neighbors already
+				//if (!checkIfSimilarNeighbor(neighbors, swapped)) {
+				//	neighbors.add(swapped);
+				//}
 			}
 		}
 		

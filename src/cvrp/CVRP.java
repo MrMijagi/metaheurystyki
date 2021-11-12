@@ -19,7 +19,8 @@ public class CVRP {
 	private Map<String, String> problem_description;
 	private Location[] locations;
 	private double[][] distance_matrix;
-	private double max_distance;                         // punishment value for incorrect solutions
+	
+	private int capacity;
 	
 	// returns cost of passed solution
 	public double calculateCost(Solution solution) {
@@ -56,36 +57,6 @@ public class CVRP {
 		//cost += 1 * this.max_distance * this.getPunishmentMultiplier(solution);
 		
 		return cost;
-	}
-	
-	private int getPunishmentMultiplier(Solution solution) {
-		int capacity = 0, curr_location = 0, multiplier = 0;
-		final int max_capacity = Integer.parseInt(this.problem_description.get("CAPACITY"));
-		
-		// set for checking if there duplicated locations
-		Set<Integer> duplicates = new HashSet<Integer>();
-				
-		for (int i = 0; i < solution.solution.size(); i++) {
-			curr_location = solution.solution.get(i);
-			
-			if (curr_location <= 0) {              // go back to depot - reset capacity
-				capacity = 0;
-			} else {                               // normal location - add capacity
-				capacity += this.locations[curr_location].getDemand();
-			}
-						
-			if (capacity > max_capacity) {         // solution is incorrect
-				multiplier++;
-				capacity = 0;                      // send it back to depot
-			}
-			
-			// check for duplicates
-			if (!duplicates.add(curr_location)) {
-				multiplier++;
-			}
-		}
-		
-		return multiplier;
 	}
 	
 	// returns true only if solution is correct
@@ -136,18 +107,14 @@ public class CVRP {
 	public void calculateDistanceMatrix() {
 		int dimension = Integer.parseInt(problem_description.get("DIMENSION"));
 		this.distance_matrix = new double[dimension][dimension];
-		double max_distance = 0., curr_distance;
+		double curr_distance;
 		
 		for (int i = 0; i < dimension; i++) {
 			for (int j = 0; j < dimension; j++) {
 				curr_distance = this.getDistanceFromCoords(i, j);
 				this.distance_matrix[i][j] = curr_distance;
-				
-				if (curr_distance > max_distance) max_distance = curr_distance;
 			}
 		}
-		
-		this.max_distance = max_distance;
 	}
 	
 	// loads problem from given file
@@ -224,6 +191,9 @@ public class CVRP {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		// test
+		this.capacity = Integer.parseInt(this.problem_description.get("CAPACITY"));
 	}
 	
 	// saves passed solution to a file
@@ -287,6 +257,6 @@ public class CVRP {
 	}
 	
 	public int getCapacity() {
-		return Integer.parseInt(this.problem_description.get("CAPACITY"));
+		return this.capacity;
 	}
 }

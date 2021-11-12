@@ -13,20 +13,21 @@ import main.Logger;
 import ts.NeighborsInterface;
 import ts.NeighborsOperators;
 
-public class TabuSearchSolver extends Solver {
+public class SimulatedAnnealingSolver extends Solver {
 	
-	private int iterations, n_size, tabu_size;
+	private int iterations, t_start, t_end, n_size;
 	
 	private NeighborsInterface get_neighbors;
+	private TemperatureMethod t_method;
 	
 	private String logger_file;
 	
-	public TabuSearchSolver(CVRP cvrp, String logger_file) {
+	public SimulatedAnnealingSolver(CVRP cvrp, String logger_file) {
 		super(cvrp);
 		this.logger_file = logger_file;
 	}
 
-	public TabuSearchSolver(CVRP cvrp) {
+	public SimulatedAnnealingSolver(CVRP cvrp) {
 		this(cvrp, "stats/default.csv");
 	}
 
@@ -36,7 +37,6 @@ public class TabuSearchSolver extends Solver {
 		
 		// initialise lists
 		List<Solution> neighbors;
-		List<Solution> tabu_list = new ArrayList<Solution>();
 		
 		// initialise best solution
 		Solution best_solution = this.random_solution();
@@ -44,14 +44,14 @@ public class TabuSearchSolver extends Solver {
 		best_solution.evaluation = this.cvrp.calculateCost(best_solution);
 		
 		// create current solution to get neighbors
-		Solution best_neighbor = new Solution(best_solution.solution);
+		Solution neighbor = new Solution(best_solution.solution);
 		
-		int t = 0;
-		Solution neighbor;
+		int t = 0, T = 100;
+		Solution best_neighbor;
 		
 		while (t < this.iterations) {
 			// get neighbors
-			neighbors = this.get_neighbors.getNeighbors(best_neighbor, this.n_size);
+			neighbors = this.get_neighbors.getNeighbors(neighbor, this.n_size);
 			
 			// evaluate neighbors, find the best one
 			best_neighbor = neighbors.get(0);
@@ -103,9 +103,16 @@ public class TabuSearchSolver extends Solver {
 					case "N_SIZE":
 						this.n_size = Integer.parseInt(parts[1].trim());
 						break;
-					case "TABU_SIZE":
-						this.tabu_size = Integer.parseInt(parts[1].trim());
+					case "T_START":
+						this.t_start = Integer.parseInt(parts[1].trim());
 						break;
+					case "T_END":
+						this.t_end = Integer.parseInt(parts[1].trim());
+						break;
+					case "T_METHOD":
+						if (parts[1].trim().equals("LINEAR")) {
+							this.t_method = TemperatureMethods::linear;
+						}
 					case "NEIGHBORS_TYPE":
 						if (parts[1].trim().equals("GREEDY")) {
 							this.get_neighbors = NeighborsOperators::getNeighbors; 
@@ -145,4 +152,5 @@ public class TabuSearchSolver extends Solver {
 		GreedySolver greedySolver = new GreedySolver(this.cvrp);
 		return greedySolver.find_solution();
 	}
+
 }

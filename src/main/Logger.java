@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import cvrp.Solution;
 
@@ -50,6 +51,46 @@ public class Logger {
 //			this.string_to_save.append(pop[i].solution);
 //			this.string_to_save.append(";");
 //			this.string_to_save.append(pop[i].evaluation);
+//		}
+		
+		this.string_to_save.append("\n");
+	}
+	
+
+	
+	public void add_neighbors(List<Solution> neighbors, Solution best_solution) {
+		double best = neighbors.get(0).evaluation, worst = neighbors.get(0).evaluation, sum = neighbors.get(0).evaluation;
+		
+		
+		for (int i = 1; i < neighbors.size(); i++) {
+			if (neighbors.get(i).evaluation < best) {
+				best = neighbors.get(i).evaluation;
+			}
+			
+			if (neighbors.get(i).evaluation > worst) {
+				worst = neighbors.get(i).evaluation;
+			}
+			
+			sum += neighbors.get(i).evaluation;
+		}
+		
+		double avg = sum / neighbors.size();
+		
+		this.string_to_save.append(this.counter++);
+		this.string_to_save.append(";");
+		this.string_to_save.append(best);
+		this.string_to_save.append(";");
+		this.string_to_save.append(avg);
+		this.string_to_save.append(";");
+		this.string_to_save.append(worst);
+		this.string_to_save.append(";");
+		this.string_to_save.append(best_solution.evaluation);
+		
+//		for (int i = 0; i < neighbors.size(); i++) {
+//			this.string_to_save.append(";");
+//			this.string_to_save.append(neighbors.get(i).solution);
+//			this.string_to_save.append(";");
+//			this.string_to_save.append(neighbors.get(i).evaluation);
 //		}
 		
 		this.string_to_save.append("\n");
