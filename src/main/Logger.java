@@ -56,7 +56,18 @@ public class Logger {
 		this.string_to_save.append("\n");
 	}
 	
-
+	public void add_neighbor(Solution best_solution, Solution neighbor, double T) {
+		this.string_to_save.append(neighbor.evaluation)
+			.append(";")
+			.append(best_solution.evaluation)
+			.append(";")
+			.append(T)
+//			.append(";")
+//			.append(neighbor.solution)
+//			.append(";")
+//			.append(best_solution.solution)
+			.append("\n");
+	}
 	
 	public void add_neighbors(List<Solution> neighbors, Solution best_solution) {
 		double best = neighbors.get(0).evaluation, worst = neighbors.get(0).evaluation, sum = neighbors.get(0).evaluation;

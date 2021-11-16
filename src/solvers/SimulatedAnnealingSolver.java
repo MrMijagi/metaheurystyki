@@ -6,19 +6,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import cvrp.CVRP;
 import cvrp.Solution;
 import main.Logger;
+import sa.RandomNeighborInterface;
+import sa.RandomNeighborOperators;
+import sa.TemperatureMethodInterface;
+import sa.TemperatureMethods;
 import ts.NeighborsInterface;
 import ts.NeighborsOperators;
 
 public class SimulatedAnnealingSolver extends Solver {
 	
-	private int iterations, t_start, t_end, n_size;
+	private int iterations, n_size;
+	private double t_param, t_start, t_end;
 	
-	private NeighborsInterface get_neighbors;
-	private TemperatureMethod t_method;
+	private RandomNeighborInterface random_neighbor;
+	private TemperatureMethodInterface t_method;
 	
 	private String logger_file;
 	
@@ -35,48 +41,65 @@ public class SimulatedAnnealingSolver extends Solver {
 	public Solution find_solution() {
 		Logger logger = new Logger(this.logger_file);
 		
-		// initialise lists
-		List<Solution> neighbors;
-		
-		// initialise best solution
+		// initialize best solution
 		Solution best_solution = this.random_solution();
 		//Solution best_solution = this.greedy_solution();
 		best_solution.evaluation = this.cvrp.calculateCost(best_solution);
 		
-		// create current solution to get neighbors
+		// create current solution
 		Solution neighbor = new Solution(best_solution.solution);
+		List<Solution> neighbors = new ArrayList<Solution>();
 		
-		int t = 0, T = 100;
-		Solution best_neighbor;
+		int t = 0;
+		double T = this.t_start;
 		
 		while (t < this.iterations) {
-			// get neighbors
-			neighbors = this.get_neighbors.getNeighbors(neighbor, this.n_size);
 			
-			// evaluate neighbors, find the best one
-			best_neighbor = neighbors.get(0);
-			best_neighbor.evaluation = this.cvrp.calculateCost(best_neighbor);
+			// alternative loop
+			neighbors = NeighborsOperators.getNeighbors(best_solution, n_size);
 			
 			for (int i = 0; i < neighbors.size(); i++) {
 				neighbor = neighbors.get(i);
-				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
+				neighbor.evaluation = cvrp.calculateCost(neighbor);
 				
-				if (!tabu_list.contains(neighbor) && neighbor.evaluation < best_neighbor.evaluation) {
-					best_neighbor = neighbor;
+				if (neighbor.evaluation < best_solution.evaluation) {
+					best_solution = neighbor;
+				} else {
+					System.out.println(best_solution.evaluation - neighbor.evaluation);
+					System.out.println(Math.exp((best_solution.evaluation - neighbor.evaluation) / T));
+					System.out.println(T);
+					System.out.println("\n");
+					if (ThreadLocalRandom.current().nextDouble()
+							< Math.exp((best_solution.evaluation - neighbor.evaluation) / T)) {
+						
+						best_solution = neighbor;
+					}
 				}
 			}
 			
-			if (best_neighbor.evaluation < best_solution.evaluation) {
-				best_solution = best_neighbor;
+			for (int i = 0; i < this.n_size; i++) {
+				// get random neighbor
+				neighbor = this.random_neighbor.random_neighbor(neighbor);
+				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
+				
+				if (neighbor.evaluation < best_solution.evaluation) {
+					best_solution = neighbor;
+				} else {
+					System.out.println(best_solution.evaluation - neighbor.evaluation);
+					System.out.println(Math.exp((best_solution.evaluation - neighbor.evaluation) / T));
+					System.out.println(T);
+					System.out.println("\n");
+					if (ThreadLocalRandom.current().nextDouble()
+							< Math.exp((best_solution.evaluation - neighbor.evaluation) / T)) {
+						
+						best_solution = neighbor;
+					}
+				}
 			}
 			
-			tabu_list.add(best_neighbor);
+			T = this.t_method.linear(T, t, this.t_param);
 			
-			if (tabu_list.size() > this.tabu_size) {
-				tabu_list.remove(0);
-			}
-			
-			logger.add_neighbors(neighbors, best_solution);
+			logger.add_neighbor(neighbor, best_solution, T);
 			
 			t++;
 		}
@@ -104,20 +127,22 @@ public class SimulatedAnnealingSolver extends Solver {
 						this.n_size = Integer.parseInt(parts[1].trim());
 						break;
 					case "T_START":
-						this.t_start = Integer.parseInt(parts[1].trim());
+						this.t_start = Double.parseDouble(parts[1].trim());
 						break;
 					case "T_END":
-						this.t_end = Integer.parseInt(parts[1].trim());
+						this.t_end = Double.parseDouble(parts[1].trim());
 						break;
+					case "T_PARAM":
+						this.t_param = Double.parseDouble(parts[1].trim());
 					case "T_METHOD":
 						if (parts[1].trim().equals("LINEAR")) {
 							this.t_method = TemperatureMethods::linear;
 						}
-					case "NEIGHBORS_TYPE":
-						if (parts[1].trim().equals("GREEDY")) {
-							this.get_neighbors = NeighborsOperators::getNeighbors; 
-						} else if (parts[1].trim().equals("RANDOM")) {
-							this.get_neighbors = NeighborsOperators::getRandomNeighbors;
+					case "RANDOM_NEIGHBOR":
+						if (parts[1].trim().equals("SWAP")) {
+							this.random_neighbor = RandomNeighborOperators::random_neighbor_swap; 
+						} else if (parts[1].trim().equals("INVERSE")) {
+							this.random_neighbor = RandomNeighborOperators::random_neighbor_inverse;
 						}
 						break;
 					}
@@ -148,9 +173,4 @@ public class SimulatedAnnealingSolver extends Solver {
 		return new Solution(locations);
 	}
 	
-	private Solution greedy_solution() {
-		GreedySolver greedySolver = new GreedySolver(this.cvrp);
-		return greedySolver.find_solution();
-	}
-
 }
