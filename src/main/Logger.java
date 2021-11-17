@@ -56,16 +56,29 @@ public class Logger {
 		this.string_to_save.append("\n");
 	}
 	
-	public void add_neighbor(Solution best_solution, Solution neighbor, double T) {
-		this.string_to_save.append(neighbor.evaluation)
+	public void add_neighbor(Solution best_solution, Solution current, double T) {
+		this.string_to_save.append(current.evaluation)
 			.append(";")
 			.append(best_solution.evaluation)
 			.append(";")
 			.append(T)
 //			.append(";")
-//			.append(neighbor.solution)
+//			.append(current.solution)
 //			.append(";")
 //			.append(best_solution.solution)
+			.append("\n");
+	}
+	
+	public void sa_debug(Solution current, Solution best, double T) {
+		this.string_to_save.append(current.evaluation)
+			.append(";")
+			.append(best.evaluation)
+			.append(";")
+			.append(T)
+			.append(";")
+			.append(best.evaluation - current.evaluation)
+			.append(";")
+			.append(Math.exp((best.evaluation - current.evaluation) / T))
 			.append("\n");
 	}
 	

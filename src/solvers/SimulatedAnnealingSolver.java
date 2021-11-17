@@ -40,6 +40,7 @@ public class SimulatedAnnealingSolver extends Solver {
 	@Override
 	public Solution find_solution() {
 		Logger logger = new Logger(this.logger_file);
+		Logger debug_logger = new Logger("stats/debug.csv");
 		
 		// initialize best solution
 		Solution best_solution = this.random_solution();
@@ -47,7 +48,10 @@ public class SimulatedAnnealingSolver extends Solver {
 		best_solution.evaluation = this.cvrp.calculateCost(best_solution);
 		
 		// create current solution
-		Solution neighbor = new Solution(best_solution.solution);
+		Solution current = new Solution(best_solution.solution);
+		current.evaluation = this.cvrp.calculateCost(current);
+		
+		Solution neighbor;
 		List<Solution> neighbors = new ArrayList<Solution>();
 		
 		int t = 0;
@@ -56,55 +60,42 @@ public class SimulatedAnnealingSolver extends Solver {
 		while (t < this.iterations) {
 			
 			// alternative loop
-			neighbors = NeighborsOperators.getNeighbors(best_solution, n_size);
-			
-			for (int i = 0; i < neighbors.size(); i++) {
-				neighbor = neighbors.get(i);
-				neighbor.evaluation = cvrp.calculateCost(neighbor);
-				
-				if (neighbor.evaluation < best_solution.evaluation) {
-					best_solution = neighbor;
-				} else {
-					System.out.println(best_solution.evaluation - neighbor.evaluation);
-					System.out.println(Math.exp((best_solution.evaluation - neighbor.evaluation) / T));
-					System.out.println(T);
-					System.out.println("\n");
-					if (ThreadLocalRandom.current().nextDouble()
-							< Math.exp((best_solution.evaluation - neighbor.evaluation) / T)) {
-						
-						best_solution = neighbor;
-					}
-				}
-			}
+			neighbors = NeighborsOperators.getNeighbors(current, n_size);
 			
 			for (int i = 0; i < this.n_size; i++) {
 				// get random neighbor
-				neighbor = this.random_neighbor.random_neighbor(neighbor);
+				neighbor = this.random_neighbor.random_neighbor(current);
 				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
 				
-				if (neighbor.evaluation < best_solution.evaluation) {
-					best_solution = neighbor;
+				if (neighbor.evaluation <= current.evaluation) {
+					current = neighbor;
 				} else {
-					System.out.println(best_solution.evaluation - neighbor.evaluation);
-					System.out.println(Math.exp((best_solution.evaluation - neighbor.evaluation) / T));
-					System.out.println(T);
-					System.out.println("\n");
+					// debug
+					//debug_logger.sa_debug(neighbor, current, T);
+					
 					if (ThreadLocalRandom.current().nextDouble()
-							< Math.exp((best_solution.evaluation - neighbor.evaluation) / T)) {
+							< Math.exp((current.evaluation - neighbor.evaluation) / T)) {
 						
-						best_solution = neighbor;
+						current = neighbor;
 					}
 				}
 			}
 			
 			T = this.t_method.linear(T, t, this.t_param);
 			
-			logger.add_neighbor(neighbor, best_solution, T);
+			if (T < this.t_end) T = this.t_end;
+			
+			if (current.evaluation < best_solution.evaluation) {
+				best_solution = current;
+			}
+			
+			logger.add_neighbor(best_solution, current, T);
 			
 			t++;
 		}
 		
 		logger.save_to_file();
+		debug_logger.save_to_file();
 		
 		return best_solution;
 	}

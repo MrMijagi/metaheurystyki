@@ -279,7 +279,7 @@ public class Main {
 				"A-n60-k9.vrp"
 		};
 		
-		testingGrounds();
+//		testingGrounds();
 //		
 //		CVRP cvrp = new CVRP();
 //		
@@ -300,8 +300,8 @@ public class Main {
 			//getGreedySolverStatistics(all_problems[i], "stats/greedyStats" + all_problems[i] + ".csv");
 			//getGeneticAlgorithmSolverStatistics(all_problems[i], "configs/ga.txt", "stats/gaStats" + all_problems[i] + ".csv", 10);
 			//getTabuSearchSolverStatistics(all_problems[i], "configs/ts.txt", "stats/tsStats" + all_problems[i] + ".csv", 10);
-			//getSimulatedAnnealingStatistics(all_problems[i], "configs/sa.txt", "stats/saStats" + all_problems[i] + ".csv", 10);
-			//System.out.println(i);
+			getSimulatedAnnealingStatistics(all_problems[i], "configs/sa.txt", "stats/saStats" + all_problems[i] + ".csv", 10);
+			System.out.println(i);
 		}
 	}
 }
