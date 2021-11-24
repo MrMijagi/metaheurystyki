@@ -33,8 +33,15 @@ public class OperatorsTests {
 		System.out.println("p1: " + p1.solution);
 		
 		for (double i = 0.; i < 1.1; i += 0.1) {
-			MutationOperators.mutation(p1, i);
-			System.out.println("\nmutation " + i + ":" + p1.solution);
+			MutationOperators.swap(p1, i);
+			System.out.println("\nswap " + i + ":" + p1.solution);
+			System.out.println("distance between p1 and p2: " + OperatorsTests.distanceBetweenRoutes(p1, p2));
+			p1 = new Solution(route1);
+		}
+		
+		for (double i = 0; i < 1.1; i += 0.1) {
+			MutationOperators.inverse(p1, i);
+			System.out.println("\ninverse " + i + ":" + p1.solution);
 			System.out.println("distance between p1 and p2: " + OperatorsTests.distanceBetweenRoutes(p1, p2));
 			p1 = new Solution(route1);
 		}

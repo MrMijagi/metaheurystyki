@@ -153,7 +153,9 @@ public class GeneticAlgorithmSolver extends Solver {
 						break;
 					case "MUTATION_TYPE":
 						if (parts[1].trim().equals("SWAP")) {
-							this.mutator = MutationOperators::mutation; 
+							this.mutator = MutationOperators::swap; 
+						} else if (parts[1].trim().equals("INVERSE")) {
+							this.mutator = MutationOperators::inverse;
 						}
 						break;
 					case "SELECTION_TYPE":

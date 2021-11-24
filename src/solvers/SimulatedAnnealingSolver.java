@@ -15,7 +15,6 @@ import sa.RandomNeighborInterface;
 import sa.RandomNeighborOperators;
 import sa.TemperatureMethodInterface;
 import sa.TemperatureMethods;
-import ts.NeighborsInterface;
 import ts.NeighborsOperators;
 
 public class SimulatedAnnealingSolver extends Solver {
@@ -61,26 +60,6 @@ public class SimulatedAnnealingSolver extends Solver {
 			for (int i = 0; i < neighbors.size(); i++) {
 				neighbor = neighbors.get(i);
 				neighbor.evaluation = cvrp.calculateCost(neighbor);
-				
-				if (neighbor.evaluation < best_solution.evaluation) {
-					best_solution = neighbor;
-				} else {
-					System.out.println(best_solution.evaluation - neighbor.evaluation);
-					System.out.println(Math.exp((best_solution.evaluation - neighbor.evaluation) / T));
-					System.out.println(T);
-					System.out.println("\n");
-					if (ThreadLocalRandom.current().nextDouble()
-							< Math.exp((best_solution.evaluation - neighbor.evaluation) / T)) {
-						
-						best_solution = neighbor;
-					}
-				}
-			}
-			
-			for (int i = 0; i < this.n_size; i++) {
-				// get random neighbor
-				neighbor = this.random_neighbor.random_neighbor(neighbor);
-				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
 				
 				if (neighbor.evaluation < best_solution.evaluation) {
 					best_solution = neighbor;
