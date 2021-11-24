@@ -295,13 +295,13 @@ public class Main {
 //		
 //		System.out.println("calculated cost: " + cvrp.calculateCost(solution));
 		
-		for (int i = 1; i < 8; i++) {
-			//getRandomSolverStatistics(all_problems[i], "stats/randomStats" + all_problems[i] + ".csv", 10000);
-			//getGreedySolverStatistics(all_problems[i], "stats/greedyStats" + all_problems[i] + ".csv");
-			//getGeneticAlgorithmSolverStatistics(all_problems[i], "configs/ga.txt", "stats/gaStats" + all_problems[i] + ".csv", 10);
-			//getTabuSearchSolverStatistics(all_problems[i], "configs/ts.txt", "stats/tsStats" + all_problems[i] + ".csv", 10);
-			//getSimulatedAnnealingStatistics(all_problems[i], "configs/sa.txt", "stats/saStats" + all_problems[i] + ".csv", 10);
-			//System.out.println(i);
-		}
+//		for (int i = 1; i < 8; i++) {
+//			//getRandomSolverStatistics(all_problems[i], "stats/randomStats" + all_problems[i] + ".csv", 10000);
+//			//getGreedySolverStatistics(all_problems[i], "stats/greedyStats" + all_problems[i] + ".csv");
+//			//getGeneticAlgorithmSolverStatistics(all_problems[i], "configs/ga.txt", "stats/gaStats" + all_problems[i] + ".csv", 10);
+//			//getTabuSearchSolverStatistics(all_problems[i], "configs/ts.txt", "stats/tsStats" + all_problems[i] + ".csv", 10);
+//			getSimulatedAnnealingStatistics(all_problems[i], "configs/sa.txt", "stats/saStats" + all_problems[i] + ".csv", 10);
+//			System.out.println(i);
+//		}
 	}
 }
