@@ -126,8 +126,10 @@ public class SimulatedAnnealingSolver extends Solver {
 					case "T_PARAM":
 						this.t_param = Double.parseDouble(parts[1].trim());
 					case "T_METHOD":
-						if (parts[1].trim().equals("LINEAR")) {
-							this.t_method = TemperatureMethods::linear;
+						if (parts[1].trim().equals("MULTIPLY")) {
+							this.t_method = TemperatureMethods::multiply;
+						} else if (parts[1].trim().equals("SUBSTRACT")) {
+							this.t_method = TemperatureMethods::substract;
 						}
 					case "RANDOM_NEIGHBOR":
 						if (parts[1].trim().equals("SWAP")) {
