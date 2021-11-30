@@ -5,10 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import cvrp.CVRP;
@@ -21,7 +18,7 @@ import ga.SelectionOperators;
 import ga.SelectorInterface;
 import main.Logger;
 
-public class GeneticAlgorithmSolver extends Solver {
+public class HybridTwoSolver extends Solver {
 	
 	private int pop_size, evolutions, selection_param;
 	private double mutation_prob, cross_prob;
@@ -31,13 +28,13 @@ public class GeneticAlgorithmSolver extends Solver {
 	private CrossoverInterface crossover;
 	
 	private String logger_file;
-	
-	public GeneticAlgorithmSolver(CVRP cvrp, String logger_file) {
+
+	public HybridTwoSolver(CVRP cvrp, String logger_file) {
 		super(cvrp);
 		this.logger_file = logger_file;
 	}
-	
-	public GeneticAlgorithmSolver(CVRP cvrp) {
+
+	public HybridTwoSolver(CVRP cvrp) {
 		this(cvrp, "stats/default.csv");
 	}
 
@@ -127,7 +124,7 @@ public class GeneticAlgorithmSolver extends Solver {
 		
 		return best_solution;
 	}
-	
+
 	@Override
 	public void load_configuration(String conf_file) {
 		try {			
@@ -226,4 +223,5 @@ public class GeneticAlgorithmSolver extends Solver {
 		
 		return new Solution(locations);
 	}
+
 }

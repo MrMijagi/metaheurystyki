@@ -51,7 +51,7 @@ public class OperatorsTests {
 		System.out.println("\np1: " + p1.solution);
 		System.out.println("p2: " + p2.solution);
 		
-		List<Solution> children = CrossoverOperators.crossover(p1, p2);
+		List<Solution> children = CrossoverOperators.OX(p1, p2);
 		
 		System.out.println("\nchildren of p1 x p2:");
 		
