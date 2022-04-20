@@ -41,6 +41,7 @@ public class HybridTwoSolver extends Solver {
 	@Override
 	public Solution find_solution() {
 		Logger logger = new Logger(this.logger_file);
+		Logger selection_logger = new Logger("stats/selection.csv");
 		int t = 0;
 		
 		Solution[] pop = this.initialise_pop();
@@ -76,12 +77,15 @@ public class HybridTwoSolver extends Solver {
 			
 			//Solution first = new Solution(best_solution.solution);
 			Solution first = new Solution(pop[min_index].solution);
-			first.evaluation = cvrp.calculateCost(first);
+			cvrp.calculateCost(first);
 			new_pop.add(first);
 			
 			while (new_pop.size() < this.pop_size) {
 				p1 = this.selector.selection(pop, this.pop_size, this.selection_param);
-				p2 = this.selector.selection(pop, this.pop_size, this.selection_param);
+				p2 = this.hybrid_selector(pop, this.pop_size, this.selection_param, p1);
+				//p2 = this.selector.selection(pop, this.pop_size, this.selection_param);
+				
+				//selection_logger.add_selection(pop, this.pop_size, p1, p2);
 				
 				// crossover
 				double random = ThreadLocalRandom.current().nextDouble();
@@ -98,7 +102,7 @@ public class HybridTwoSolver extends Solver {
 					
 					// before adding it to next pop, check if it's not a clone		
 					if (!this.check_if_clone(new_pop, child)) {
-						child.evaluation = this.cvrp.calculateCost(child);
+						this.cvrp.calculateCost(child);
 						new_pop.add(child);
 						
 						if (child.evaluation < best_solution.evaluation) {
@@ -121,6 +125,7 @@ public class HybridTwoSolver extends Solver {
 		}
 		
 		logger.save_to_file();
+		selection_logger.save_to_file();
 		
 		return best_solution;
 	}
@@ -182,6 +187,21 @@ public class HybridTwoSolver extends Solver {
 			e.printStackTrace();
 		}
 	}
+
+	private Solution hybrid_selector(Solution[] pop, int pop_size, int selection_param, Solution p1) {
+		int random_index = ThreadLocalRandom.current().nextInt(0, pop_size);
+		Solution p2 = pop[random_index];
+		
+		for (int i = 0; i < selection_param - 1; i++) {
+			random_index = ThreadLocalRandom.current().nextInt(0, pop_size);
+			
+			if (Math.abs(p1.evaluation - pop[random_index].evaluation) > Math.abs(p1.evaluation - p2.evaluation)) {
+				p2 = pop[random_index];
+			}
+		}
+		
+		return p2;
+	}
 	
 	private boolean check_if_clone(List<Solution> pop, Solution solution) {
 		for (Solution individual: pop) {
@@ -193,7 +213,8 @@ public class HybridTwoSolver extends Solver {
 	
 	private void evaluate_pop(Solution[] pop) {
 		for (int i = 0; i < this.pop_size; i++) {
-			pop[i].evaluation = cvrp.calculateCost(pop[i]);
+			cvrp.calculateCost(pop[i]);
+			pop[i].evaluation = pop[i].evaluation;
 		}
 	}
 	

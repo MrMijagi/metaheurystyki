@@ -44,24 +44,26 @@ public class SimulatedAnnealingSolver extends Solver {
 		// initialize best solution
 		Solution best_solution = this.random_solution();
 		//Solution best_solution = this.greedy_solution();
-		best_solution.evaluation = this.cvrp.calculateCost(best_solution);
+		this.cvrp.calculateCost(best_solution);
 		
 		// create current solution
 		Solution current = new Solution(best_solution.solution);
-		current.evaluation = this.cvrp.calculateCost(current);
+		this.cvrp.calculateCost(current);
 		
 		Solution neighbor;
 		List<Solution> neighbors = new ArrayList<Solution>();
 		
 		int t = 0;
 		double T = this.t_start;
+		double t_decrease_value = (this.t_start - this.t_end) / this.iterations * 1.01;
 		
 		while (t < this.iterations) {
 
 			for (int i = 0; i < this.n_size; i++) {
 				// get random neighbor
 				neighbor = this.random_neighbor.random_neighbor(current);
-				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
+				this.cvrp.calculateCost(neighbor);
+//				this.cvrp.calculateCostDifference(current, neighbor);
 				
 				if (neighbor.evaluation <= current.evaluation) {
 					current = neighbor;
@@ -77,7 +79,8 @@ public class SimulatedAnnealingSolver extends Solver {
 				}
 			}
 			
-			T = this.t_method.linear(T, t, this.t_param);
+			T = this.t_method.method(this.t_start, this.t_end, t, this.iterations);
+			//T -= t_decrease_value;
 			
 			if (T < this.t_end) T = this.t_end;
 			
@@ -108,10 +111,10 @@ public class SimulatedAnnealingSolver extends Solver {
 										
 					switch(parts[0].trim()) {
 					case "ITERATIONS":
-						this.iterations = Integer.parseInt(parts[1].trim());
+						this.iterations = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "N_SIZE":
-						this.n_size = Integer.parseInt(parts[1].trim());
+						this.n_size = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "T_START":
 						this.t_start = Double.parseDouble(parts[1].trim());
@@ -119,13 +122,11 @@ public class SimulatedAnnealingSolver extends Solver {
 					case "T_END":
 						this.t_end = Double.parseDouble(parts[1].trim());
 						break;
-					case "T_PARAM":
-						this.t_param = Double.parseDouble(parts[1].trim());
 					case "T_METHOD":
-						if (parts[1].trim().equals("MULTIPLY")) {
-							this.t_method = TemperatureMethods::multiply;
-						} else if (parts[1].trim().equals("SUBSTRACT")) {
-							this.t_method = TemperatureMethods::substract;
+						if (parts[1].trim().equals("LINEAR")) {
+							this.t_method = TemperatureMethods::linear;
+						} else if (parts[1].trim().equals("SQUARE_ROOT")) {
+							this.t_method = TemperatureMethods::square_root;
 						}
 					case "RANDOM_NEIGHBOR":
 						if (parts[1].trim().equals("SWAP")) {

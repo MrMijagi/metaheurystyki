@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Solution {
+public class Solution implements Comparable<Solution> {
 	
 	public List<Integer> solution;
 	public double evaluation;
@@ -15,6 +15,11 @@ public class Solution {
 	
 	public Solution(List<Integer> solution) {
 		this.solution = new ArrayList<Integer>(solution);
+	}
+	
+	public Solution(List<Integer> solution, double evaluation) {
+		this.solution = new ArrayList<Integer>(solution);
+		this.evaluation = evaluation;
 	}
 	
 	public void swapFromIndices(int i, int j) {
@@ -62,4 +67,14 @@ public class Solution {
 		Solution other = (Solution) obj;
 		return Objects.equals(solution, other.solution);
 	}
+
+    @Override
+    public int compareTo(Solution that){
+        //returns -1 if "this" object is less than "that" object
+        //returns 0 if they are equal
+        //returns 1 if "this" object is greater than "that" object
+    	if (this.evaluation < that.evaluation) return -1;
+    	if (this.evaluation > that.evaluation) return 1;
+    	return 0;
+    }
 }

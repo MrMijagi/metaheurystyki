@@ -3,6 +3,7 @@ package ga;
 import java.util.concurrent.ThreadLocalRandom;
 
 import cvrp.Solution;
+import main.RandomRange;
 
 public class MutationOperators {
 	public static void swap(Solution o1, double probability) {
@@ -24,14 +25,9 @@ public class MutationOperators {
 		double random = ThreadLocalRandom.current().nextDouble();
 		
 		if (random < probability) {
-			int from_index = ThreadLocalRandom.current().nextInt(0, o1.solution.size());
-			int to_index = ThreadLocalRandom.current().nextInt(0, o1.solution.size() - 1);
+			RandomRange range = new RandomRange(o1.solution.size());
 			
-			if (to_index == from_index) {
-				to_index = o1.solution.size() - 1;
-			}
-			
-			o1.inverseFromIndices(from_index, to_index);
+			o1.inverseFromIndices(range.from, range.to);
 		}
 	}
 }

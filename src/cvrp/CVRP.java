@@ -22,8 +22,8 @@ public class CVRP {
 	
 	private int capacity;
 	
-	// returns cost of passed solution
-	public double calculateCost(Solution solution) {
+	// calculates entire cost of solution and puts it into evaluation variable
+	public void calculateCost(Solution solution) {
 		double cost = 0.;
 		int capacity = 0;
 		int curr_location = 0;    // depot
@@ -52,11 +52,26 @@ public class CVRP {
 		// come back to depot
 		cost += this.getDistance(curr_location, 0);
 		
-		// check if solution is correct - add punishment value
-		// punishment = maximum distance between any two locations * 2 * multiplier
-		//cost += 1 * this.max_distance * this.getPunishmentMultiplier(solution);
+		solution.evaluation = cost;
+	}
+	
+	// calculates route cost by adding the difference between two solutions
+	public void calculateCostDifference(Solution s1, Solution s2) {
+		double cost = s1.evaluation;
+		int curr_location1 = 0; // depot
+		int curr_location2 = 0;
 		
-		return cost;
+		for (int i = 0; i < s1.solution.size(); i++) {
+			int next_location1 = s1.solution.get(i) < 0 ? 0 : s1.solution.get(i);
+			int next_location2 = s2.solution.get(i) < 0 ? 0 : s2.solution.get(i);
+			
+			if (curr_location1 != curr_location2 && next_location1 != next_location2) {
+				cost -= this.getDistance(curr_location1, next_location1);
+				cost -= this.getDistance(curr_location2, next_location2);
+			}
+		}
+		
+		s2.evaluation = cost;
 	}
 	
 	// returns true only if solution is correct
@@ -226,7 +241,8 @@ public class CVRP {
 		
 		// append cost
 		string_to_save.append("\n\nCost: ");
-		string_to_save.append(this.calculateCost(solution));
+		this.calculateCost(solution);
+		string_to_save.append(solution.evaluation);
 		string_to_save.append("\n");
 		
 		try {

@@ -10,6 +10,7 @@ import java.util.List;
 import cvrp.CVRP;
 import cvrp.Solution;
 import main.Logger;
+import main.SolutionMap;
 import ts.NeighborsInterface;
 import ts.NeighborsOperators;
 
@@ -20,6 +21,8 @@ public class TabuSearchSolver extends Solver {
 	private NeighborsInterface get_neighbors;
 	
 	private String logger_file;
+	
+	private SolutionMap map;
 	
 	public TabuSearchSolver(CVRP cvrp, String logger_file) {
 		super(cvrp);
@@ -38,10 +41,14 @@ public class TabuSearchSolver extends Solver {
 		List<Solution> neighbors;
 		List<Solution> tabu_list = new ArrayList<Solution>();
 		
+		// hashmap
+		this.map = new SolutionMap(this.tabu_size);
+		
 		// initialise best solution
 		Solution best_solution = this.random_solution();
 		//Solution best_solution = this.greedy_solution();
-		best_solution.evaluation = this.cvrp.calculateCost(best_solution);
+		this.calculateWithMap(best_solution);
+//		this.cvrp.calculateCost(best_solution);
 		
 		// create current solution to get neighbors
 		Solution best_neighbor = new Solution(best_solution.solution);
@@ -55,11 +62,13 @@ public class TabuSearchSolver extends Solver {
 			
 			// evaluate neighbors, find the best one
 			best_neighbor = neighbors.get(0);
-			best_neighbor.evaluation = this.cvrp.calculateCost(best_neighbor);
+			this.calculateWithMap(best_neighbor);
+//			this.cvrp.calculateCost(best_neighbor);
 			
 			for (int i = 0; i < neighbors.size(); i++) {
 				neighbor = neighbors.get(i);
-				neighbor.evaluation = this.cvrp.calculateCost(neighbor);
+				this.calculateWithMap(neighbor);
+//				this.cvrp.calculateCost(neighbor);
 				
 				if (!tabu_list.contains(neighbor) && neighbor.evaluation < best_neighbor.evaluation) {
 					best_neighbor = neighbor;
@@ -98,19 +107,19 @@ public class TabuSearchSolver extends Solver {
 										
 					switch(parts[0].trim()) {
 					case "ITERATIONS":
-						this.iterations = Integer.parseInt(parts[1].trim());
+						this.iterations = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "N_SIZE":
-						this.n_size = Integer.parseInt(parts[1].trim());
+						this.n_size = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "TABU_SIZE":
-						this.tabu_size = Integer.parseInt(parts[1].trim());
+						this.tabu_size = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "NEIGHBORS_TYPE":
-						if (parts[1].trim().equals("GREEDY")) {
-							this.get_neighbors = NeighborsOperators::getNeighbors; 
-						} else if (parts[1].trim().equals("RANDOM")) {
-							this.get_neighbors = NeighborsOperators::getRandomNeighbors;
+						if (parts[1].trim().equals("SWAP")) {
+							this.get_neighbors = NeighborsOperators::getNeighborsSwap; 
+						} else if (parts[1].trim().equals("INVERSE")) {
+							this.get_neighbors = NeighborsOperators::getNeighborsInverse;
 						}
 						break;
 					}
@@ -141,8 +150,17 @@ public class TabuSearchSolver extends Solver {
 		return new Solution(locations);
 	}
 	
-	private Solution greedy_solution() {
-		GreedySolver greedySolver = new GreedySolver(this.cvrp);
-		return greedySolver.find_solution();
+	
+	// calculates cost of solution
+	// firsts tries to find it in map
+	// if its not in there it adds solution to map
+	// and calculates cost the normal way
+	public void calculateWithMap(Solution solution) {
+		if (this.map.check(solution)) {
+			solution.evaluation = this.map.get(solution);
+		} else {
+			this.cvrp.calculateCost(solution);
+			this.map.put(solution, solution.evaluation);
+		}
 	}
 }

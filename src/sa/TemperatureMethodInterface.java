@@ -2,5 +2,5 @@ package sa;
 
 @FunctionalInterface
 public interface TemperatureMethodInterface {
-	double linear(double T, int i, double param);
+	double method(double t_start, double t_end, int t, int iterations);
 }

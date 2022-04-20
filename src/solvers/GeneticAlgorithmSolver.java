@@ -79,7 +79,7 @@ public class GeneticAlgorithmSolver extends Solver {
 			
 			//Solution first = new Solution(best_solution.solution);
 			Solution first = new Solution(pop[min_index].solution);
-			first.evaluation = cvrp.calculateCost(first);
+			cvrp.calculateCost(first);
 			new_pop.add(first);
 			
 			while (new_pop.size() < this.pop_size) {
@@ -101,7 +101,7 @@ public class GeneticAlgorithmSolver extends Solver {
 					
 					// before adding it to next pop, check if it's not a clone		
 					if (!this.check_if_clone(new_pop, child)) {
-						child.evaluation = this.cvrp.calculateCost(child);
+						this.cvrp.calculateCost(child);
 						new_pop.add(child);
 						
 						if (child.evaluation < best_solution.evaluation) {
@@ -140,10 +140,10 @@ public class GeneticAlgorithmSolver extends Solver {
 										
 					switch(parts[0].trim()) {
 					case "POP_SIZE":
-						this.pop_size = Integer.parseInt(parts[1].trim());
+						this.pop_size = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "EVOLUTIONS":
-						this.evolutions = Integer.parseInt(parts[1].trim());
+						this.evolutions = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "MUTATION_PROB":
 						this.mutation_prob = Double.parseDouble(parts[1].trim());
@@ -166,7 +166,7 @@ public class GeneticAlgorithmSolver extends Solver {
 						}
 						break;
 					case "SELECTION_PARAM":
-						this.selection_param = Integer.parseInt(parts[1].trim());
+						this.selection_param = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "CROSSOVER_TYPE":
 						if (parts[1].trim().equals("OX")) {
@@ -196,7 +196,8 @@ public class GeneticAlgorithmSolver extends Solver {
 	
 	private void evaluate_pop(Solution[] pop) {
 		for (int i = 0; i < this.pop_size; i++) {
-			pop[i].evaluation = cvrp.calculateCost(pop[i]);
+			cvrp.calculateCost(pop[i]);
+			pop[i].evaluation = pop[i].evaluation;
 		}
 	}
 	

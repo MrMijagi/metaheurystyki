@@ -53,7 +53,15 @@ public class OperatorsTests {
 		
 		List<Solution> children = CrossoverOperators.OX(p1, p2);
 		
-		System.out.println("\nchildren of p1 x p2:");
+		System.out.println("\nchildren of p1 x p2 (ox):");
+		
+		for (Solution solution: children) {
+			System.out.println(solution.solution);
+		}
+		
+		children = CrossoverOperators.PMX(p1, p2);
+		
+		System.out.println("\nchildren of p1 x p2 (pmx):");
 		
 		for (Solution solution: children) {
 			System.out.println(solution.solution);

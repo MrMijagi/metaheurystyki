@@ -12,12 +12,12 @@ import cvrp.Solution;
 class OperatorsTests {
 
 	@Test
-	void testGetNeighbors() {
+	void testGetNeighborsSwap() {
 		Solution solution = new Solution(Arrays.asList(
 			1, 2, -1, 3, -2, -3
 		));
 		
-		List<Solution> neighbors = NeighborsOperators.getNeighbors(solution, 7);
+		List<Solution> neighbors = NeighborsOperators.getNeighborsSwap(solution, 7);
 		
 		List<Solution> correct_neighbors = Arrays.asList(
 			new Solution(Arrays.asList(2, 1, -1, 3, -2, -3)),
@@ -35,12 +35,12 @@ class OperatorsTests {
 	}
 
 	@Test
-	void testGetRandomNeighbors() {
+	void testGetNeighborsInverse() {
 		Solution solution = new Solution(Arrays.asList(
 			1, 2, -1, 3, -2, -3
 		));
 		
-		List<Solution> neighbors = NeighborsOperators.getRandomNeighbors(solution, 7);
+		List<Solution> neighbors = NeighborsOperators.getNeighborsInverse(solution, 7);
 		
 		System.out.println("\ngetRandomNeighbors:");
 		for (Solution neighbor: neighbors) {

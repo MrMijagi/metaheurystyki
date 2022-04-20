@@ -84,8 +84,9 @@ class CVRPTest {
 				1, 4, -1, 3, 2, 5, -2, -3, -4, -5);
 		
 		Solution correct_solution = new Solution(route);
+		cvrp.calculateCost(correct_solution);
 		
-		assertEquals((int) (cvrp.calculateCost(correct_solution)), 265);
+		assertEquals((int) correct_solution.evaluation, 265);
 	}
 	
 	@Test

@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import cvrp.Solution;
@@ -56,6 +59,26 @@ public class Logger {
 		this.string_to_save.append("\n");
 	}
 	
+	public void add_selection(Solution[] pop, int pop_size, Solution p1, Solution p2) {
+		List<Solution> pop_copy = new ArrayList<Solution>();
+		
+		for (int i = 0; i < pop_size; i++) {
+			pop_copy.add(new Solution(
+					pop[i].solution,
+					pop[i].evaluation));
+		}
+		
+		Collections.sort(pop_copy);
+		
+		int p1_index = pop_copy.indexOf(p1);
+		int p2_index = pop_copy.indexOf(p2);
+		
+		this.string_to_save.append(p1_index)
+			.append(";")
+			.append(p2_index)
+			.append("\n");
+	}
+	
 	public void add_neighbor(Solution best_solution, Solution current, double T) {
 		this.string_to_save.append(current.evaluation)
 			.append(";")
@@ -80,6 +103,40 @@ public class Logger {
 			.append(";")
 			.append(Math.exp((best.evaluation - current.evaluation) / T))
 			.append("\n");
+	}
+	
+	public void add_time(List<Long> times) {
+		long best = times.get(0), worst = times.get(0), sum = times.get(0);
+		
+		for (int i = 1; i < times.size(); i++) {
+			if (times.get(i) < best) {
+				best = times.get(i);
+			}
+			
+			if (times.get(i) > worst) {
+				worst = times.get(i);
+			}
+			
+			sum += times.get(i);
+		}
+		
+		double avg = (double) sum / times.size();
+		double std = 0.;
+		
+		for (int i = 0; i < times.size(); i++) {
+			std += Math.pow((((double) times.get(i)) - avg), 2);
+		}
+		
+		std = Math.sqrt(std / times.size());
+		
+		this.string_to_save.append(best);
+		this.string_to_save.append(";");
+		this.string_to_save.append(avg);
+		this.string_to_save.append(";");
+		this.string_to_save.append(worst);
+		this.string_to_save.append(";");
+		this.string_to_save.append(std);
+		this.string_to_save.append("\n");
 	}
 	
 	public void add_neighbors(List<Solution> neighbors, Solution best_solution) {

@@ -17,30 +17,33 @@ import ga.MutatorInterface;
 import ga.SelectionOperators;
 import ga.SelectorInterface;
 import main.Logger;
+import sa.RandomNeighborOperators;
 
 public class HybridOneSolver extends Solver {
 	
-	private int pop_size, evolutions, selection_param;
-	private double mutation_prob, cross_prob;
+	private int pop_size, evolutions, selection_param, hybrid_n_size, hybrid_iterations;
+	private double mutation_prob, cross_prob, hybrid_percent;
 	
 	private MutatorInterface mutator;
 	private SelectorInterface selector;
 	private CrossoverInterface crossover;
 	
-	private String logger_file;
+	private String logger_file, logger_hybrid_file;
 	
-	public HybridOneSolver(CVRP cvrp, String logger_file) {
+	public HybridOneSolver(CVRP cvrp, String logger_file, String logger_hybrid_file) {
 		super(cvrp);
 		this.logger_file = logger_file;
+		this.logger_hybrid_file = logger_hybrid_file;
 	}
 
 	public HybridOneSolver(CVRP cvrp) {
-		this(cvrp, "stats/default.csv");
+		this(cvrp, "stats/default.csv", "stats/default_hybrid.csv");
 	}
 
 	@Override
 	public Solution find_solution() {
 		Logger logger = new Logger(this.logger_file);
+		Logger logger_hybrid = new Logger(this.logger_hybrid_file);
 		int t = 0;
 		
 		Solution[] pop = this.initialise_pop();
@@ -48,6 +51,7 @@ public class HybridOneSolver extends Solver {
 		
 		// save stats
 		logger.add_pop(pop, this.pop_size);
+		//logger_hybrid.add_pop(pop, this.pop_size);
 		
 		// find best solution
 		Solution best_solution = pop[0]; 
@@ -60,6 +64,9 @@ public class HybridOneSolver extends Solver {
 		
 		Solution p1, p2;
 		List<Solution> children = new ArrayList<Solution>();
+		
+		// how many solutions to run hill climbing on
+		int hill_climbing_amount = (int) (this.hybrid_percent * this.pop_size);
 		
 		while (t < this.evolutions) {
 			List<Solution> new_pop = new ArrayList<Solution>();
@@ -76,7 +83,7 @@ public class HybridOneSolver extends Solver {
 			
 			//Solution first = new Solution(best_solution.solution);
 			Solution first = new Solution(pop[min_index].solution);
-			first.evaluation = cvrp.calculateCost(first);
+			cvrp.calculateCost(first);
 			new_pop.add(first);
 			
 			while (new_pop.size() < this.pop_size) {
@@ -98,7 +105,7 @@ public class HybridOneSolver extends Solver {
 					
 					// before adding it to next pop, check if it's not a clone		
 					if (!this.check_if_clone(new_pop, child)) {
-						child.evaluation = this.cvrp.calculateCost(child);
+						this.cvrp.calculateCost(child);
 						new_pop.add(child);
 						
 						if (child.evaluation < best_solution.evaluation) {
@@ -114,13 +121,23 @@ public class HybridOneSolver extends Solver {
 			pop = new Solution[new_pop.size()];
 			new_pop.toArray(pop);
 			
+			// save stats before hill climbing
+			//logger.add_pop(pop, this.pop_size);
+			
+			// hybrid add - take hybrid_percentage% of population and run hill climbing algorithm
+			for (int i = 0; i < hill_climbing_amount; i++) {
+				int solution_index = ThreadLocalRandom.current().nextInt(0, this.pop_size);
+				pop[solution_index] = this.hill_climbing(pop[solution_index]);
+			}
+			
 			// save stats
-			logger.add_pop(pop, this.pop_size);
+			logger_hybrid.add_pop(pop, this.pop_size);
 			
 			t++;
 		}
 		
 		logger.save_to_file();
+		logger_hybrid.save_to_file();
 		
 		return best_solution;
 	}
@@ -137,10 +154,10 @@ public class HybridOneSolver extends Solver {
 										
 					switch(parts[0].trim()) {
 					case "POP_SIZE":
-						this.pop_size = Integer.parseInt(parts[1].trim());
+						this.pop_size = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "EVOLUTIONS":
-						this.evolutions = Integer.parseInt(parts[1].trim());
+						this.evolutions = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "MUTATION_PROB":
 						this.mutation_prob = Double.parseDouble(parts[1].trim());
@@ -163,7 +180,7 @@ public class HybridOneSolver extends Solver {
 						}
 						break;
 					case "SELECTION_PARAM":
-						this.selection_param = Integer.parseInt(parts[1].trim());
+						this.selection_param = (int) Double.parseDouble(parts[1].trim());
 						break;
 					case "CROSSOVER_TYPE":
 						if (parts[1].trim().equals("OX")) {
@@ -171,6 +188,15 @@ public class HybridOneSolver extends Solver {
 						} else if (parts[1].trim().equals("PMX")) {
 							this.crossover = CrossoverOperators::PMX;
 						}
+						break;
+					case "HYBRID_ITERATIONS":
+						this.hybrid_iterations = (int) Double.parseDouble(parts[1].trim());
+						break;
+					case "HYBRID_N_SIZE":
+						this.hybrid_n_size = (int) Double.parseDouble(parts[1].trim());
+						break;
+					case "HYBRID_PERCENT":
+						this.hybrid_percent = Double.parseDouble(parts[1].trim());
 						break;
 					}
 				}
@@ -181,6 +207,25 @@ public class HybridOneSolver extends Solver {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private Solution hill_climbing(Solution solution) {
+		Solution neighbor;
+		
+		for (int j = 0; j < this.hybrid_iterations; j++) {
+			for (int i = 0; i < this.hybrid_n_size; i++) {
+				// get random neighbor
+				neighbor = RandomNeighborOperators.random_neighbor_swap(solution);
+//				this.cvrp.calculateCost(neighbor);
+				this.cvrp.calculateCostDifference(solution, neighbor);
+				
+				if (neighbor.evaluation <= solution.evaluation) {
+					solution = neighbor;
+				}
+			}
+		}
+		
+		return solution;
 	}
 	
 	private boolean check_if_clone(List<Solution> pop, Solution solution) {
@@ -193,7 +238,8 @@ public class HybridOneSolver extends Solver {
 	
 	private void evaluate_pop(Solution[] pop) {
 		for (int i = 0; i < this.pop_size; i++) {
-			pop[i].evaluation = cvrp.calculateCost(pop[i]);
+			cvrp.calculateCost(pop[i]);
+			pop[i].evaluation = pop[i].evaluation;
 		}
 	}
 	
