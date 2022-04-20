@@ -10,3 +10,5 @@ jars/
 generated/
 configs/
 bin/
+.settings/
+.idea/
